@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IR Widgets</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: #fff;
+      font-family: Inter, sans-serif;
+      /* allow horizontal scroll so widgets aren't clipped on mobile */
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    /* On mobile, widgets get a fixed min-width so user can scroll horizontally */
+    :root {
+      --widget-min-width: 360px;
+      --hp: 12px;
+    }
+    @media (min-width: 600px)  { :root { --hp: 52px; --widget-min-width: 100%; } }
+    @media (min-width: 1200px) { :root { --hp: calc(100vw * 0.1 - 8px); --widget-min-width: 100%; } }
+    @media (min-width: 1920px) { :root { --hp: 192px; --widget-min-width: 100%; } }
+
+    #root { padding-bottom: 40px; }
+
+    .ticker-bar {
+      border-top: 2px solid #C62030;
+      border-bottom: 2px solid #C62030;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .section {
+      padding: 32px var(--hp) 0;
+    }
+    .section + .section {
+      border-top: 1px solid #E5E7EB;
+      margin-top: 32px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #101727;
+      margin-bottom: 12px;
+    }
+
+    .widget-wrap {
+      min-width: var(--widget-min-width);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-btn {
+      padding: 8px 24px;
+      border-radius: 6px;
+      border: 2px solid #E5E7EB;
+      background: #F3F4F6;
+      color: #9CA3AF;
+      font-weight: 400;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      border-color: #C62030;
+      background: #fff;
+      color: #101727;
+      font-weight: 600;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+const CLIENT_ID = '5be9c146-613e-4141-a351-1f5e13fc5513';
+const THEME_ID  = '81a06c05-1a48-4d1b-8dbd-bcf60a76730f';
+const VERSION   = 'v2';
+
+const SECTIONS_EN = [
+  { id: 'stock-ticker',          title: '',                       minH: 52,  ticker: true },
+  { id: 'company-snapshot',      title: 'Company Snapshot',       minH: 320 },
+  { id: 'corporate-news',        title: 'Announcements',          minH: 400 },
+  { id: 'fact-sheet-table',      title: 'Fact Sheet',             minH: 500, tabs: [{ label: 'Table', id: 'fact-sheet-table' }, { label: 'Chart', id: 'fact-sheet-charts' }] },
+  { id: 'stock-activity-simple', title: 'Stock Activity',         minH: 500, tabs: [{ label: 'Simple', id: 'stock-activity-simple' }, { label: 'Advanced', id: 'stock-activity-advanced' }] },
+  { id: 'corporate-actions',     title: 'Corporate Actions',      minH: 400 },
+  { id: 'company-financials',    title: 'Company Financials',     minH: 500 },
+  { id: 'investment-calculator', title: 'Investment Calculator',  minH: 400 },
+  { id: 'share-price',           title: 'Share Price',            minH: 400 },
+  { id: 'peer-group-analysis',   title: 'Peer Group Analysis',    minH: 400 },
+  { id: 'performance',           title: 'Performance',            minH: 400 },
+  { id: 'share-series',          title: 'Share Series',           minH: 300 },
+  { id: 'email-subscription',    title: 'Email Subscription',     minH: 300 },
+];
+
+const SECTIONS_AR = [
+  { id: 'stock-ticker',          title: '',                                    minH: 52,  ticker: true },
+  { id: 'company-snapshot',      title: 'نظرة عامة عن الشركة',                minH: 320 },
+  { id: 'corporate-news',        title: 'الإعلانات',                           minH: 400 },
+  { id: 'fact-sheet-table',      title: 'نشرة المعلومات',                      minH: 500, tabs: [{ label: 'جدول', id: 'fact-sheet-table' }, { label: 'رسم بياني', id: 'fact-sheet-charts' }] },
+  { id: 'stock-activity-simple', title: 'نشاط السهم',                          minH: 500, tabs: [{ label: 'بسيط', id: 'stock-activity-simple' }, { label: 'متقدم', id: 'stock-activity-advanced' }] },
+  { id: 'corporate-actions',     title: 'الإجراءات النظامية',                  minH: 400 },
+  { id: 'company-financials',    title: 'البيانات المالية',                    minH: 500 },
+  { id: 'investment-calculator', title: 'حاسبة الاستثمار',                     minH: 400 },
+  { id: 'share-price',           title: 'سعر السهم',                           minH: 400 },
+  { id: 'peer-group-analysis',   title: 'تحليل المجموعة المماثلة',             minH: 400 },
+  { id: 'performance',           title: 'الأداء',                              minH: 400 },
+  { id: 'share-series',          title: 'سلسلة الأسهم',                        minH: 300 },
+  { id: 'email-subscription',    title: 'الاشتراك بالبريد الإلكتروني',         minH: 300 },
+];
+
+let lang = 'en';
+const params = new URLSearchParams(location.search);
+if (params.get('lang') === 'ar' || params.get('lang') === 'en') lang = params.get('lang');
+
+function loadWidget(widgetId, minH) {
+  const el = document.getElementById(widgetId + '-widget');
+  if (!el) return;
+  const tryLoad = () => {
+    if (typeof window.loadWidget === 'function') {
+      window.loadWidget(widgetId, CLIENT_ID, lang, THEME_ID, VERSION);
+    } else {
+      setTimeout(tryLoad, 200);
+    }
+  };
+  tryLoad();
+}
+
+function buildTabs(tabs, minH, isAr) {
+  const wrap = document.createElement('div');
+
+  const tabBar = document.createElement('div');
+  tabBar.className = 'tabs';
+
+  const panels = tabs.map((tab, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = tab.label;
+
+    const panel = document.createElement('div');
+    panel.className = 'tab-panel' + (i === 0 ? ' active' : '');
+
+    const widgetWrap = document.createElement('div');
+    widgetWrap.className = 'widget-wrap';
+    widgetWrap.style.minHeight = minH + 'px';
+
+    const widgetEl = document.createElement('div');
+    widgetEl.id = tab.id + '-widget';
+    widgetWrap.appendChild(widgetEl);
+    panel.appendChild(widgetWrap);
+
+    btn.addEventListener('click', () => {
+      tabBar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      wrap.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      panel.classList.add('active');
+    });
+
+    tabBar.appendChild(btn);
+    return panel;
+  });
+
+  wrap.appendChild(tabBar);
+  panels.forEach(p => wrap.appendChild(p));
+  return wrap;
+}
+
+function render() {
+  const isAr = lang === 'ar';
+  const sections = isAr ? SECTIONS_AR : SECTIONS_EN;
+  const root = document.getElementById('root');
+  root.setAttribute('dir', isAr ? 'rtl' : 'ltr');
+  root.innerHTML = '';
+
+  sections.forEach((s, idx) => {
+    if (s.ticker) {
+      const bar = document.createElement('div');
+      bar.className = 'ticker-bar';
+      const widgetWrap = document.createElement('div');
+      widgetWrap.className = 'widget-wrap';
+      widgetWrap.style.minHeight = '52px';
+      const widgetEl = document.createElement('div');
+      widgetEl.id = s.id + '-widget';
+      widgetWrap.appendChild(widgetEl);
+      bar.appendChild(widgetWrap);
+      root.appendChild(bar);
+      return;
+    }
+
+    const section = document.createElement('div');
+    section.className = 'section';
+
+    if (s.title) {
+      const h2 = document.createElement('h2');
+      h2.className = 'section-title';
+      h2.style.textAlign = isAr ? 'right' : 'left';
+      h2.textContent = s.title;
+      section.appendChild(h2);
+    }
+
+    if (s.tabs) {
+      section.appendChild(buildTabs(s.tabs, s.minH, isAr));
+    } else {
+      const widgetWrap = document.createElement('div');
+      widgetWrap.className = 'widget-wrap';
+      widgetWrap.style.minHeight = s.minH + 'px';
+      const widgetEl = document.createElement('div');
+      widgetEl.id = s.id + '-widget';
+      widgetWrap.appendChild(widgetEl);
+      section.appendChild(widgetWrap);
+    }
+
+    root.appendChild(section);
+  });
+}
+
+// Report height to Flutter
+function reportHeight() {
+  const h = document.documentElement.scrollHeight;
+  window.parent && window.parent.postMessage({ type: 'ir-page-height', height: h }, '*');
+}
+
+// Forward scroll events to Flutter
+window.addEventListener('wheel', e => {
+  window.parent && window.parent.postMessage({ type: 'iframe-wheel', deltaY: e.deltaY }, '*');
+}, { passive: true });
+
+let touchStartY = 0;
+window.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+window.addEventListener('touchmove', e => {
+  const dy = touchStartY - e.touches[0].clientY;
+  touchStartY = e.touches[0].clientY;
+  window.parent && window.parent.postMessage({ type: 'iframe-wheel', deltaY: dy }, '*');
+}, { passive: true });
+
+// Listen for lang change from Flutter
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'set-lang' && (e.data.lang === 'ar' || e.data.lang === 'en')) {
+    lang = e.data.lang;
+    render();
+    loadAllWidgets();
+  }
+});
+
+function loadAllWidgets() {
+  const sections = lang === 'ar' ? SECTIONS_AR : SECTIONS_EN;
+  sections.forEach(s => {
+    if (s.tabs) {
+      s.tabs.forEach(t => loadWidget(t.id, s.minH));
+    } else {
+      loadWidget(s.id, s.minH);
+    }
+  });
+}
+
+// Load widget script then render
+const script = document.createElement('script');
+script.src = 'https://irp.atnmo.com/v2/widget/widget-loader.js';
+script.onload = () => {
+  render();
+  loadAllWidgets();
+  const ro = new ResizeObserver(reportHeight);
+  ro.observe(document.documentElement);
+  reportHeight();
+};
+document.head.appendChild(script);
+</script>
+</body>
+</html>

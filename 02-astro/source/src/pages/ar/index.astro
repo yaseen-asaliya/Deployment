@@ -1,0 +1,31 @@
+---
+import Base from '../../layouts/Base.astro';
+import TopBar from '../../components/TopBar.astro';
+import NavigationBar from '../../components/NavigationBar.astro';
+import Hero from '../../components/Hero.astro';
+import Intro from '../../components/Intro.astro';
+import InvestmentCase from '../../components/InvestmentCase.astro';
+import StockTicker from '../../components/StockTicker.astro';
+import WidgetTabs from '../../components/WidgetTabs.astro';
+import Footer from '../../components/Footer.astro';
+import { COPY, CASE_ITEMS } from '../../data/widgets.js';
+
+const lang = 'ar';
+const copy = COPY[lang];
+const items = CASE_ITEMS[lang];
+---
+<Base
+  title="مجموعة السيف — علاقات المستثمرين"
+  description="مجموعة السيف (تداول: 4192). المجموعة السعودية الرائدة في تجارة الأدوات المنزلية والمطبخ — علاقات المستثمرين، الحوكمة، الإفصاحات، ومعلومات السهم."
+  lang={lang}
+  canonical="https://alsaifgallery.com/ar/ir/"
+>
+  <TopBar copy={copy} />
+  <NavigationBar copy={copy} />
+  <Hero copy={copy} />
+  <Intro copy={copy} />
+  <InvestmentCase copy={copy} items={items} />
+  <StockTicker />
+  <WidgetTabs lang={lang} />
+  <Footer copy={copy} />
+</Base>

@@ -1,0 +1,20 @@
+---
+const { copy, items } = Astro.props;
+---
+<section class="case">
+  <div class="case__inner">
+    <div class="case__header">
+      <div class="case__eyebrow">{copy.caseEyebrow}</div>
+      <h2 class="case__title">{copy.caseTitle}</h2>
+    </div>
+    <div class="case__grid">
+      {items.map(item => (
+        <article class="case__item">
+          <div class="case__num">{item.n}</div>
+          <h3>{item.title}</h3>
+          <p>{item.body}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

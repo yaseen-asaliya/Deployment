@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>Investor Relations Widget</title>
+<style>
+  * { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+  }
+  
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background: #ffffff;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  #widget-container {
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  
+  /* Header للصفحة */
+  .page-header {
+    background: #F8FAFB;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .page-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1A1A1A;
+    margin: 0;
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #1A1A1A;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  
+  .close-btn:hover {
+    opacity: 0.7;
+  }
+</style>
+<script src="https://irp.atnmo.com/v3/widget/widget-loader.js"></script>
+</head>
+<body>
+<div class="page-header">
+  <h1 class="page-title" id="page-title">Investor Relations</h1>
+  <button class="close-btn" onclick="window.close()">×</button>
+</div>
+<div id="widget-container"></div>
+<script>
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var widgetType = params.get('type') || '';
+  var lang = params.get('lang') || 'en';
+
+  // تحديث العنوان
+  var titleMap = {
+    'stock-ticker': lang === 'ar' ? 'شريط الأسهم' : 'Stock Ticker',
+    'company-snapshot': lang === 'ar' ? 'لمحة عن الشركة' : 'Company Snapshot',
+    'corporate-news': lang === 'ar' ? 'أخبار الشركة' : 'Corporate News',
+    'fact-sheet': lang === 'ar' ? 'صحيفة الحقائق' : 'Fact Sheet',
+    'stock-activity': lang === 'ar' ? 'نشاط السهم' : 'Stock Activity',
+    'corporate-actions': lang === 'ar' ? 'إجراءات الشركة' : 'Corporate Actions',
+    'company-financials': lang === 'ar' ? 'البيانات المالية' : 'Company Financials',
+    'share-price': lang === 'ar' ? 'سعر السهم' : 'Share Price',
+    'performance': lang === 'ar' ? 'الأداء' : 'Performance',
+    'investment-calculator': lang === 'ar' ? 'حاسبة الاستثمار' : 'Investment Calculator',
+    'share-series': lang === 'ar' ? 'سلسلة الأسهم' : 'Share Series',
+    'zakat-calculator': lang === 'ar' ? 'حاسبة الزكاة' : 'Zakat Calculator',
+    'share-view': lang === 'ar' ? 'عرض الأسهم' : 'Share View',
+    'price-lookup': lang === 'ar' ? 'البحث عن السعر' : 'Price Lookup',
+    'peer-group-analysis': lang === 'ar' ? 'تحليل المجموعة المماثلة' : 'Peer Group Analysis',
+    'email-subscription': lang === 'ar' ? 'الاشتراك بالبريد' : 'Email Subscription'
+  };
+  
+  document.getElementById('page-title').textContent = titleMap[widgetType] || 'Investor Relations';
+  document.title = titleMap[widgetType] || 'Investor Relations';
+
+  var container = document.getElementById('widget-container');
+  container.id = widgetType + '-widget';
+
+  window.addEventListener('load', function() {
+    if (typeof loadWidget === 'function') {
+      loadWidget(widgetType, '5be9c146-613e-4141-a351-1f5e13fc5513', lang, '81a06c05-1a48-4d1b-8dbd-bcf60a76730f', 'v3');
+    }
+  });
+})();
+</script>
+</body>
+</html>

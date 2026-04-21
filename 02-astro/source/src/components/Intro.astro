@@ -1,0 +1,13 @@
+---
+const { copy } = Astro.props;
+---
+<section class="intro">
+  <div class="intro__inner">
+    <div>
+      <h2 class="intro__title" set:html={copy.introTitle} />
+    </div>
+    <div class="intro__body">
+      {copy.introBody.map((p) => <p>{p}</p>)}
+    </div>
+  </div>
+</section>

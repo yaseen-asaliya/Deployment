@@ -1,0 +1,33 @@
+---
+const { copy } = Astro.props;
+const links = [
+  { href: '#home',     label: copy.navHome },
+  { href: '#about',    label: copy.navAbout },
+  { href: '#strategy', label: copy.navStrategy },
+  { href: '#ir',       label: copy.navIR, active: true },
+  { href: '#news',     label: copy.navNews },
+  { href: '#contact',  label: copy.navContact },
+];
+---
+<nav class="navbar" aria-label="Primary">
+  <div class="navbar__inner">
+    <a class="navbar__logo" href="/" aria-label="Al Saif Gallery">
+      <img src="/img/logo.svg" alt="Al Saif Gallery" width="160" height="40" />
+    </a>
+    <ul class="navbar__links" role="menubar">
+      {links.map(l => (
+        <li role="none"><a role="menuitem" href={l.href} class={l.active ? 'is-active' : ''} aria-current={l.active ? 'page' : undefined}>{l.label}</a></li>
+      ))}
+    </ul>
+    <button class="navbar__toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="navbar__mobile-menu" id="mobile-menu" hidden>
+      <ul>
+        {links.map(l => (
+          <li><a href={l.href} class={l.active ? 'is-active' : ''}>{l.label}</a></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</nav>

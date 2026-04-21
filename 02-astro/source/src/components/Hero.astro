@@ -1,0 +1,10 @@
+---
+const { copy } = Astro.props;
+---
+<section class="hero" id="ir">
+  <div class="hero__inner">
+    <div class="hero__eyebrow">{copy.eyebrow}</div>
+    <h1 class="hero__title">{copy.heroTitle}</h1>
+    <p class="hero__subtitle">{copy.heroSubtitle}</p>
+  </div>
+</section>

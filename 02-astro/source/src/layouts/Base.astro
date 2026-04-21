@@ -1,0 +1,27 @@
+---
+import '../styles/global.css';
+const { title, description, lang = 'en', canonical } = Astro.props;
+const dir = lang === 'ar' ? 'rtl' : 'ltr';
+---
+<!doctype html>
+<html lang={lang} dir={dir}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  {canonical && <link rel="canonical" href={canonical} />}
+  <link rel="alternate" hreflang="en" href="/" />
+  <link rel="alternate" hreflang="ar" href="/ar/" />
+  <link rel="preconnect" href="https://irp.atnmo.com" crossorigin />
+  <link rel="dns-prefetch" href="https://irp.atnmo.com" />
+  <meta name="theme-color" content="#C62030" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%238B0000'/><ellipse cx='50' cy='50' rx='20' ry='48' fill='none' stroke='white' stroke-width='2.5'/><line x1='2' y1='50' x2='98' y2='50' stroke='white' stroke-width='2.5'/></svg>" />
+</head>
+<body>
+  <div class="page">
+    <slot />
+  </div>
+  <script src="/widgets.js" defer></script>
+</body>
+</html>
